@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <!--
     If you are serving your web app in a path other than the root, change the
@@ -25,11 +26,33 @@
 
   <title>votaapp</title>
   <link rel="manifest" href="manifest.json">
+
+
 </head>
+
 <body>
   <!-- This script installs service_worker.js to provide PWA functionality to
        application. For more information, see:
        https://developers.google.com/web/fundamentals/primers/service-workers -->
+  <script src="https://www.gstatic.com/firebasejs/8.0.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.0.2/firebase-analytics.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-firestore.js"></script>
+  <script>
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    var firebaseConfig = {
+      apiKey: "AIzaSyBHGsivL1DEkbRLzERCFl8xZLB_Hh0JG_A",
+      authDomain: "voteapp-80c83.firebaseapp.com",
+      projectId: "voteapp-80c83",
+      storageBucket: "voteapp-80c83.appspot.com",
+      messagingSenderId: "239585150433",
+      appId: "1:239585150433:web:a89f3a5c77c04eac8d7ea0",
+      measurementId: "G-ZPMK0PRH3C"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+  </script>
   <script>
     var serviceWorkerVersion = null;
     var scriptLoaded = false;
@@ -94,5 +117,10 @@
       loadMainDartJs();
     }
   </script>
+  <!-- The core Firebase JS SDK is always required and must be listed first -->
+
+
+
 </body>
+
 </html>

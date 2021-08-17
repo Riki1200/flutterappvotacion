@@ -1,28 +1,24 @@
-import 'dart:io';
-import 'package:flutter/material.dart';
 import 'dart:core';
-import 'package:async/async.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:votaapp/widgets/votes_content.dart';
+import 'web/admin.dart';
+import 'package:flutter/services.dart';
+import 'widgets/nav_bar.dart';
+import 'package:votaapp/utils/get_device_info.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-
-int run(int a, int b) {
-  if (a > b) return a;
-  else return b;
-
-}
-
-void main() {
-  runApp(MyApp());
-
-  try {
-    if (Platform.isAndroid || Platform.isIOS) {
-      print("Is Android or Ios");
-    }else {
-      print("is web");
-    }
-  }catch (Exception) {
-    print(Exception.toString());
+// @dart=2.9
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  if (kIsWeb) {
+    runApp(Admin());
+  } else {
+    await Firebase.initializeApp();
+    runApp(MyApp());
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle());
   }
-
 }
 
 class MyApp extends StatelessWidget {
@@ -30,12 +26,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Vote APP',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.indigo,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Vote APP'),
     );
   }
 }
@@ -49,36 +45,49 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+
+  @override
+  void initState() {
+    super.initState();
+
+    SystemChrome.setEnabledSystemUIOverlays([]);
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
+      appBar: Appbar(context),
+
+      body: Container(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+            Center(
+              child: Stack(
+                textDirection: TextDirection.rtl,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(30),
+                    child: VoteCard(),
+                  )
+                ],
+              ),
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+}
+
+class Cards extends StatelessWidget {
+  @override
+  Widget build(BuildContext build) {
+    return Container(
+      child: Column(
+        children: [Text("Soy un nuevo container")],
+      ),
     );
   }
 }
