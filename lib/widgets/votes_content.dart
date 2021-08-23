@@ -263,7 +263,7 @@ class _VoteCard extends State<VoteCard> {
             .then((_) {
           print("clicked: ${_.docs}");
           final result = _.docs.single.id;
-
+          
           users.doc(result).update(
               {'against': FieldValue.arrayUnion(value)}).then((value) {});
         });
