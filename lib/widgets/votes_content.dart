@@ -248,9 +248,7 @@ class _VoteCard extends State<VoteCard> {
           print("clicked: ${_.docs}");
           final result = _.docs.single.id;
           users.doc(result).update({
-            'inFavor': [],
             'abstain': FieldValue.arrayUnion(value),
-            'against': []
           }).then((value) {});
         });
         break;
@@ -266,11 +264,8 @@ class _VoteCard extends State<VoteCard> {
           print("clicked: ${_.docs}");
           final result = _.docs.single.id;
 
-          users.doc(result).update({
-            'inFavor': [],
-            'abstain': [],
-            'against': FieldValue.arrayUnion(value)
-          }).then((value) {});
+          users.doc(result).update(
+              {'against': FieldValue.arrayUnion(value)}).then((value) {});
         });
         break;
       default:
