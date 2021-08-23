@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:convert';
 
 FirebaseFirestore firestore = FirebaseFirestore.instance;
 
@@ -21,6 +22,7 @@ class _AdminWeb extends State<AdminWeb> {
     super.initState();
   }
 
+  bool closedVote = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,8 +51,182 @@ class _AdminWeb extends State<AdminWeb> {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return CircularProgressIndicator();
                     }
+
                     if (snapshot.hasData) {
-                      return Text("IS Correctly");
+                      final parse =
+                          snapshot.data?.docs.map((e) => e.data()).toList();
+
+                      var data = json.encode(parse);
+                      var jsonMap = json.decode(data);
+                      var str = jsonEncode(jsonMap);
+                      var to = jsonDecode(str);
+
+                      return Expanded(
+                        child: ListView.builder(
+                          padding: EdgeInsets.all(10),
+                          itemCount: to.length,
+                          itemBuilder: (context, index) {
+                            return Flexible(
+                                child: Card(
+                              elevation: 2,
+                              child: Padding(
+                                  padding: EdgeInsets.all(10),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.max,
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.all(10),
+                                        child: Text(
+                                          to[index]["answer"],
+                                          textAlign: TextAlign.start,
+                                          textDirection: TextDirection.ltr,
+                                          style: TextStyle(
+                                            fontFamily: "arial",
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 30,
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding:
+                                            EdgeInsets.only(top: 20, left: 16),
+                                        child: Row(
+                                          children: [
+                                            Text("Votos maximos: " +
+                                                to[index]['numTotalVotes']
+                                                    .toString()),
+                                            Spacer(
+                                              flex: 2,
+                                            ),
+                                            IconButton(
+                                                alignment: Alignment.center,
+                                                onPressed: () {
+                                                  final ButtonStyle style =
+                                                      ElevatedButton.styleFrom(
+                                                          textStyle:
+                                                              const TextStyle(
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .black,
+                                                                  fontSize:
+                                                                      20));
+                                                  showDialog(
+                                                    context: context,
+                                                    builder: (context) {
+                                                      return AlertDialog(
+                                                        title: Text(
+                                                          'Estas seguro?',
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                        ),
+                                                        actions: [
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              ElevatedButton(
+                                                                onPressed: () =>
+                                                                    Navigator.pop(
+                                                                        context,
+                                                                        false),
+                                                                child:
+                                                                    Text('No'),
+                                                              ),
+                                                              Padding(
+                                                                  padding:
+                                                                      EdgeInsets
+                                                                          .all(
+                                                                              10)),
+                                                              ElevatedButton(
+                                                                onPressed:
+                                                                    () async {
+                                                                  users.get().then(
+                                                                      (value) async {
+                                                                    print(value
+                                                                        .docs);
+                                                                  });
+
+                                                                  users
+                                                                      .where(
+                                                                        'answer',
+                                                                        isEqualTo:
+                                                                            to[index]['answer'],
+                                                                      )
+                                                                      .get()
+                                                                      .then(
+                                                                          (value) {
+                                                                    value.docs
+                                                                        .forEach(
+                                                                            (element) {
+                                                                      print(
+                                                                          "clicked: ${element.id}");
+                                                                      users
+                                                                          .doc(element
+                                                                              .id)
+                                                                          .delete()
+                                                                          .then(
+                                                                              (value) {
+                                                                        print(
+                                                                            "Why do all deleted?");
+                                                                      });
+                                                                    });
+                                                                  });
+
+                                                                  Navigator.pop(
+                                                                      context,
+                                                                      true);
+                                                                }, // passing true
+                                                                child:
+                                                                    Text('Si'),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      );
+                                                    },
+                                                  );
+                                                },
+                                                icon: Icon(Icons.delete)),
+                                            ElevatedButton(
+                                                onPressed: () async {
+                                                  users
+                                                      .where(
+                                                        'answer',
+                                                        isEqualTo: to[index]
+                                                            ['answer'],
+                                                      )
+                                                      .get()
+                                                      .then((value) {
+                                                    value.docs
+                                                        .forEach((element) {
+                                                      print(
+                                                          "clicked: ${element.id}");
+                                                      users
+                                                          .doc(element.id)
+                                                          .update({
+                                                        'isClosed': true
+                                                      }).then((value) {
+                                                        print("Done");
+                                                      });
+                                                    });
+                                                  });
+                                                },
+                                                child: Text("Cerrar ecuesta"))
+                                          ],
+                                        ),
+                                      )
+                                    ],
+                                  )),
+                            ));
+                          },
+                        ),
+                      );
                     }
                     return Center(
                       child: CircularProgressIndicator(),
@@ -91,7 +267,7 @@ class Admin extends StatelessWidget {
       theme: ThemeData(
           primarySwatch: Colors.blue,
           visualDensity: VisualDensity.adaptivePlatformDensity),
-      home: AdminWeb(),
+      routes: {'/': (context) => AdminWeb()},
     );
   }
 }
@@ -171,34 +347,40 @@ class _FormState extends StatefulWidget {
   }
 }
 
+class MyRoutes extends Route<String> {}
+
 class FormWidget extends State<_FormState> {
   String answer = '';
   num totalVotes = 0;
-
+  final answerController = TextEditingController();
+  final numVotesController = TextEditingController();
+  final nameVote = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   void endSnackbar() {
-    Future.delayed(Duration(seconds: 5), () {
-      Navigator.popAndPushNamed(context, "/");
+    Future.delayed(Duration(seconds: 1), () {
+      answerController.text = '';
+      numVotesController.text = '';
+      nameVote.text = '';
     });
   }
 
-  final answerController = TextEditingController();
-  final numVotesController = TextEditingController();
   @override
   void dispose() {
     // Clean up the controller when the widget is disposed.
     answerController.dispose();
     numVotesController.dispose();
+    nameVote.dispose();
     super.dispose();
   }
 
-  void saveVotes() async {
+  Future saveVotes() async {
     CollectionReference users = FirebaseFirestore.instance.collection('votes');
 
-    await users.add({
-      'inFavor': 0,
-      'abstain': 0,
-      'against': 0,
+    return await users.doc(nameVote.text).set({
+      'isClosed': false,
+      'inFavor': [],
+      'abstain': [],
+      'against': [],
       'answer': answerController.text,
       'numTotalVotes': num.parse(numVotesController.text)
     });
@@ -213,6 +395,25 @@ class FormWidget extends State<_FormState> {
           Text(
             "Crear encuesta",
             style: TextStyle(fontSize: 40),
+          ),
+          TextFormField(
+            controller: nameVote,
+            cursorColor: Colors.black,
+            decoration: InputDecoration(
+              hintText: "Nombre unico de la encuesta",
+              fillColor: Colors.grey[300],
+              hintStyle: TextStyle(color: Colors.grey[400]),
+              filled: true,
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Ingresar un nombre unico de la encuesta ';
+              }
+              return null;
+            },
+          ),
+          Divider(
+            color: Colors.transparent,
           ),
           TextFormField(
             controller: answerController,
@@ -256,16 +457,17 @@ class FormWidget extends State<_FormState> {
             child: RaisedButton(
               padding:
                   EdgeInsets.only(left: 30, right: 30, top: 20, bottom: 20),
-              onPressed: () {
+              onPressed: () async {
                 if (_formKey.currentState!.validate()) {
-                  saveVotes();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      backgroundColor: Colors.green[400],
-                      content: Text("Ha sido guardado con exito"),
-                      onVisible: endSnackbar,
-                    ),
-                  );
+                  saveVotes().then(
+                      (value) => ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              backgroundColor: Colors.green[400],
+                              content: Text("Ha sido guardado con exito"),
+                              onVisible: endSnackbar,
+                              duration: Duration(seconds: 3),
+                            ),
+                          ));
                 }
               },
               child: const Text('Guardar'),
