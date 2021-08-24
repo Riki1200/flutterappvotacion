@@ -46,7 +46,7 @@ class _VoteCard extends State<VoteCard> {
                 final parse = snapshot.data?.docs.map((e) => e.data()).toList();
                 var userID = widget.user!.isAnonymous
                     ? widget.user?.uid
-                    : widget.user?.uid as String;
+                    : widget.user?.uid;
                 var idUsers = [];
                 var data = json.encode(parse);
                 var jsonMap = json.decode(data);
@@ -143,7 +143,7 @@ class _VoteCard extends State<VoteCard> {
                                                               Icons.mood_bad)),
                                                     ],
                                                   ),
-                                                  Column(
+                                                  new Column(
                                                     children: [
                                                       Text(to[index]['against']
                                                           .length
@@ -231,8 +231,8 @@ class _VoteCard extends State<VoteCard> {
 
           users.doc(result).update({
             'inFavor': FieldValue.arrayUnion(value),
-            'abstain': [],
-            'against': []
+            'abstain': FieldValue.arrayRemove(value),
+            'against': FieldValue.arrayRemove(value)
           }).then((value) {});
         });
         break;
@@ -248,7 +248,9 @@ class _VoteCard extends State<VoteCard> {
           print("clicked: ${_.docs}");
           final result = _.docs.single.id;
           users.doc(result).update({
+            'inFavor': FieldValue.arrayRemove(value),
             'abstain': FieldValue.arrayUnion(value),
+            "against": FieldValue.arrayRemove(value)
           }).then((value) {});
         });
         break;
@@ -263,9 +265,12 @@ class _VoteCard extends State<VoteCard> {
             .then((_) {
           print("clicked: ${_.docs}");
           final result = _.docs.single.id;
-          
-          users.doc(result).update(
-              {'against': FieldValue.arrayUnion(value)}).then((value) {});
+
+          users.doc(result).update({
+            'inFavor': FieldValue.arrayRemove(value),
+            'abstain': FieldValue.arrayRemove(value),
+            'against': FieldValue.arrayUnion(value),
+          }).then((value) {});
         });
         break;
       default:

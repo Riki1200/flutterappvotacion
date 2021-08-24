@@ -133,7 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                               var jsonMap = json.decode(data);
                                               var str = jsonEncode(jsonMap);
                                               var to = jsonDecode(str);
-
+                                              print(to[0]['isClosed']);
                                               if (snapshot.hasData) {
                                                 if (to.length > 0) {
                                                   return ListView.builder(

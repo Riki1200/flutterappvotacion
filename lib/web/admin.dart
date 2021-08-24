@@ -220,7 +220,59 @@ class _AdminWeb extends State<AdminWeb> {
                                                 child: Text("Cerrar ecuesta"))
                                           ],
                                         ),
-                                      )
+                                      ),
+                                      SizedBox(
+                                        height: 50,
+                                      ),
+                                      Padding(
+                                        padding:
+                                            EdgeInsets.only(top: 20, left: 16),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.stretch,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Text(
+                                                    "Personas a favor: ${to[index]['inFavor'].length}"),
+                                                SizedBox(
+                                                  width: 50,
+                                                ),
+                                                Icon(Icons.favorite,
+                                                    color: Colors.green),
+                                              ],
+                                            ),
+                                            Row(
+                                              children: [
+                                                Text(
+                                                    "Personas a favor: ${to[index]['abstain'].length}"),
+                                                SizedBox(
+                                                  width: 50,
+                                                ),
+                                                Icon(
+                                                  Icons.mood_bad,
+                                                  color: Colors.yellow[500],
+                                                ),
+                                              ],
+                                            ),
+                                            Row(
+                                              children: [
+                                                Text(
+                                                    "Personas en contra: ${to[index]['against'].length}"),
+                                                SizedBox(
+                                                  width: 33,
+                                                ),
+                                                Icon(
+                                                  Icons.mood_bad,
+                                                  color: Colors.red,
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ],
                                   )),
                             ));
